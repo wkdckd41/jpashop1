@@ -8,11 +8,44 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.xml.transform.Result;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
+
 @RestController // @Controller + @ResponseBody
 @RequiredArgsConstructor
 public class MemberApiController {
 
     private final MemberService memberService;
+
+    @GetMapping("/api/v1/members")
+    public List<Member> membersV1() {
+        return memberService.findMembers();
+    } // 엔티티를 직접 노출한다. 엔티티가 변하면 API 스펙이 변한다.
+
+    @GetMapping("/api/v2/members")
+    public Result membersV2() {
+        List<Member> findMembers = memberService.findMembers();
+        List<MemberDto> collect = findMembers.stream()
+                .map(m -> new MemberDto(m.getName()))
+                .collect(Collectors.toList());
+
+        return new Result(collect);
+    } // 엔티티 대신에 DTO를 반환한다. API 스펙을 유지할 수 있다.
+
+    @Data
+    @AllArgsConstructor
+    static class Result<T> {
+        private T data;
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class MemberDto {
+        private String name;
+    }
 
     @PostMapping("/api/v1/members")
     public CreateMemberResponse saveMemberV1(@RequestBody @Valid Member member) {
