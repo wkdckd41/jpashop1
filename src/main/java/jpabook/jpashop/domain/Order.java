@@ -13,7 +13,8 @@ import java.util.List;
 @Getter @Setter
 public class Order {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     @Column(name = "order_id")
     private Long id;
 
@@ -47,5 +48,44 @@ public class Order {
     public void setDelivery(Delivery delivery) {
         this.delivery = delivery;
         delivery.setOrder(this);
+    }
+
+    //==생성 메서드==//
+    public static Order createOrder(Member member, Delivery delivery, OrderItem... orderItems) { // ...은 가변인자
+        Order order = new Order();
+        order.setMember(member); // 주문한 회원
+        order.setDelivery(delivery); // 배송정보
+        for (OrderItem orderItem : orderItems) {
+            order.addOrderItem(orderItem); // 주문 상품
+        }
+        order.setStatus(OrderStatus.ORDER); // 주문 상태
+        order.setOrderDate(LocalDateTime.now()); // 주문 시간
+        return order;
+    }
+
+    //==비즈니스 로직==//
+    /**
+     * 주문 취소
+     */
+    public void cancel() {
+        if (delivery.getStatus() == DeliveryStatus.COMP) { // 배송완료 상태면 취소 불가
+            throw new IllegalStateException("이미 배송완료된 상품은 취소가 불가능합니다.");
+        }
+        this.setStatus(OrderStatus.CANCEL); // 주문 상태를 취소로 변경
+        for (OrderItem orderItem : orderItems) {
+            orderItem.cancel(); // 주문 상품의 수량을 원복
+        }
+    }
+
+    //==조회 로직==//
+    /**
+     * 전체 주문 가격 조회
+     *
+     * @return
+     */
+    public int getTotalPrice() {
+        return orderItems.stream()
+            .mapToInt(OrderItem::getTotalPrice)
+            .sum(); // 주문 상품의 가격을 모두 더함
     }
 }
