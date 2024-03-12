@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static jakarta.persistence.FetchType.LAZY;
+
 @Entity
 @Table(name = "orders")
 @Getter @Setter
@@ -21,16 +23,16 @@ public class Order {
     @Column(name = "order_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY) // 지연로딩 // 즉시로딩은 EAGER
+    @ManyToOne(fetch = LAZY) // 지연로딩 // 즉시로딩은 EAGER
     @JoinColumn(name = "member_id")
     private Member member;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL) // OrderItem에 있는 order 필드에 의해 매핑
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "delivery_id")
-    private Delivery delivery;
+    private Delivery delivery; //배송정보
 
     private LocalDateTime orderDate; // 주문시간
 
@@ -83,12 +85,12 @@ public class Order {
     //==조회 로직==//
     /**
      * 전체 주문 가격 조회
-     *
-     * @return
-     */
+        */
     public int getTotalPrice() {
-        return orderItems.stream()
-            .mapToInt(OrderItem::getTotalPrice)
-            .sum(); // 주문 상품의 가격을 모두 더함
+        int totalPrice = 0;
+        for (OrderItem orderItem : orderItems) {
+            totalPrice += orderItem.getTotalPrice();
+        }
+        return totalPrice;
     }
 }
