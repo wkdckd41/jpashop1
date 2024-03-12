@@ -30,11 +30,6 @@ public class OrderService {
         Member member = memberRepository.findOne(memberId); // 회원 조회
         Item item = itemRepository.findOne(itemId); // 상품 조회
 
-        // 재고 수량 확인
-        if (item.getStockQuantity() < count) {
-            throw new IllegalStateException("need more stock");
-        }
-
         // 배송정보 생성
         Delivery delivery = new Delivery(); // 배송정보 생성
         delivery.setAddress(member.getAddress()); // 회원 주소로 배송
