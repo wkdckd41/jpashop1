@@ -38,4 +38,10 @@ public class MemberService {
     public Member findOne(Long memberId) {
         return memberRepository.findOne(memberId); // 단건 조회
     }
+
+    @Transactional
+    public void update(Long id, String name) {
+        Member member = memberRepository.findOne(id); // 엔티티 조회
+        member.setName(name); // 엔티티 수정
+    }
 }
