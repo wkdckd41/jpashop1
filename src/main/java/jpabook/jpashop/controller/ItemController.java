@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
@@ -38,5 +40,36 @@ public class ItemController {
     public String list(Model model) {
         model.addAttribute("items", itemService.findItems());
         return "items/itemList";
+    }
+
+    @GetMapping("/items/{itemId}/edit")
+    public String updateItemForm(@PathVariable("itemId") Long itemId, Model model) { // PathVariable을 사용하여 itemId를 받아온다.
+        Book item = (Book) itemService.findOne(itemId);
+
+        BookFrom form = new BookFrom();
+        form.setId(item.getId());
+        form.setName(item.getName());
+        form.setPrice(item.getPrice());
+        form.setStockQuantity(item.getStockQuantity());
+        form.setAuthor(item.getAuthor());
+        form.setIsbn(item.getIsbn());
+
+        model.addAttribute("form", form);
+        return "items/updateItemForm";
+    }
+
+    @PostMapping("/items/{itemId}/edit")
+    public String updateItem(@PathVariable String itemId, @ModelAttribute("form") BookFrom form) {
+        // @ModelAttribute("form")을 사용하여 form 객체를 생성하고, form 객체에 요청 파라미터의 값을 바인딩한다.
+        Book book = new Book();
+        book.setId(form.getId());
+        book.setName(form.getName());
+        book.setPrice(form.getPrice());
+        book.setStockQuantity(form.getStockQuantity());
+        book.setAuthor(form.getAuthor());
+        book.setIsbn(form.getIsbn());
+
+        itemService.saveItem(book);
+        return "redirect:/items";
     }
 }
