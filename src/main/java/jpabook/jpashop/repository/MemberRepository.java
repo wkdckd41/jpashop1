@@ -3,15 +3,16 @@ package jpabook.jpashop.repository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jpabook.jpashop.domain.Member;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository // Spring이 관리하는 Repository로 등록
+@RequiredArgsConstructor // final이 붙은 필드만 가지고 생성자를 만들어줌
 public class MemberRepository {
 
-    @PersistenceContext // EntityManager를 주입받음
-    private EntityManager em; // JPA의 모든 데이터 변경은 트랜잭션 안에서 실행되어야 함
+    private final EntityManager em; // @PersistenceContext와 동일한 역할을 함
 
     public void save(Member member) {
         em.persist(member); // 영속성 컨텍스트에 member를 저장
