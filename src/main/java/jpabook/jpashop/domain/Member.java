@@ -2,7 +2,7 @@ package jpabook.jpashop.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,7 +13,8 @@ import java.util.List;
 @Getter @Setter
 public class Member {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     @Column(name = "member_id")
     private Long id;
 
